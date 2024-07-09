@@ -1,65 +1,52 @@
 // Create Dino Constructor
-function Dino(species, weight, height, diet, where, when, fact) {
-  this.species = species;
-  this.weight = weight;
-  this.height = height;
-  this.diet = diet;
-  this.where = where;
-  this.when = when;
-  this.fact = fact;
+class Dino {
+  constructor(dinoOject) {
+    const { species, weight, height, diet, where, when, fact } = dinoOject;
+    this.species = species;
+    this.weight = weight;
+    this.height = height;
+    this.diet = diet;
+    this.where = where;
+    this.when = when;
+    this.fact = fact;
+  }
 }
 
-function Human(species, weight, height, diet) {
-  this.species = species;
-  this.weight = weight;
-  this.height = height;
-  this.diet = diet;
+// Create Human Constructor
+class Human {
+  constructor(species, weight, height, diet) {
+    this.species = species;
+    this.weight = weight;
+    this.height = height;
+    this.diet = diet;
+  }
 }
 
 // Create Dino Objects
-
-// const Dino = new Dino()
+const getDinoOject = async () => {
+  const listDinoFromJson = await fetch("./dino.json");
+  const convertDataDino = await listDinoFromJson.json();
+  const listOjectDino = convertDataDino["Dinos"].map((item) => new Dino(item));
+  return listOjectDino;
+};
 
 // Create Human Object
+const humanOject = new Human();
 
-// Use IIFE to get human data from form// dont know how to
-
+// Get Data Human
 const getDataHuman = function () {
-  const human = {};
   const formElements = document.querySelectorAll(
     "#name,#feet,#inches,#weight, #diet"
   );
   const [name, height_feet, height_inches, weight, diet] = formElements;
-  human.species = name.value;
-  human.height =
-    parseInt(height_feet.value) * 12 + parseInt(height_inches.value);
-  human.weight = weight.value;
-  human.diet = diet.value;
-  return human;
-};
-
-const getDinoOject = async () => {
-  const list_dino = await fetch("./dino.json");
-  const data_dino = await list_dino.json();
-  return data_dino.Dinos;
+  humanOject.species = name.value;
+  humanOject.height =
+    Number(height_feet.value) * 12 + Number(height_inches.value);
+  humanOject.weight = weight.value;
+  humanOject.diet = diet.value;
 };
 
 // Create Dino Compare Method 1
-// NOTE: Weight in JSON file is in lbs, height in inches.
-const randomFact = async (dios, human) => {
-  const randomIndex = Math.floor(Math.random() * dios.length);
-  switch (randomIndex) {
-    case 1:
-      break;
-
-    default:
-      break;
-  }
-
-  return dios;
-};
-
-// Create Dino Compare Method 2
 // NOTE: Weight in JSON file is in lbs, height in inches.
 
 const factHeights = (dinoHeight, humanHeight) => {
@@ -73,6 +60,8 @@ const factHeights = (dinoHeight, humanHeight) => {
     } inches.`;
   else return `You are as tall as a ${dinoHeight} inches tall dinosaur.`;
 };
+// Create Dino Compare Method 2
+// NOTE: Weight in JSON file is in lbs, height in inches.
 
 const factWeight = (dinoWeight, humanWeight) => {
   if (humanWeight > dinoWeight)
@@ -88,22 +77,23 @@ const factWeight = (dinoWeight, humanWeight) => {
 
 // Create Dino Compare Method 3
 // NOTE: Weight in JSON file is in lbs, height in inches.
-// const factDiet = (dinoDiet, humanDiet) => {
-//   if (humanDiet.toLowerCase() === dinoDiet)
-//     return `You have the same diet as a ${dinoDiet} dinosaur.`;
-//   else return `You have a different diet compared to a ${dinoDiet} dinosaur.`;
-// };
+
+const factDiet = (dinoDiet, humanDiet) => {
+  if (humanDiet.toLowerCase() === dinoDiet)
+    return `You have the same diet as a ${dinoDiet} dinosaur.`;
+  else return `You have a different diet compared to a ${dinoDiet} dinosaur.`;
+};
 
 // Generate Tiles for each Dino in Array
 
-const generateTiles = (arr, human) => {
+const generateTiles = (arr) => {
   const elementGridDino = document.getElementById("grid");
-  const elementItem = arr.map((element) => {
+  const elementList = arr.map((element) => {
     element.species = element.species.toLowerCase();
     return `
       <div class="grid-item">
         <h3>${element.species}</h3>
-        <img src="./images/${element.species}.png" alt="">
+        <img src="./images/${element.species}.png" alt=${element.species}>
         <p>${element.fact}</p>
       </div>
     `;
@@ -111,12 +101,12 @@ const generateTiles = (arr, human) => {
 
   const elementHuman = `
       <div class="grid-item">
-        <h3>Human</h3>
-        <img src="./images/human.png" alt="">
+        <h3>${humanOject.species}</h3>
+        <img src="./images/human.png" alt="human">
       </div>
   `;
-  elementItem.splice(4, 0, elementHuman);
-  elementGridDino.insertAdjacentHTML("afterbegin", elementItem.join(""));
+  elementList.splice(4, 0, elementHuman);
+  elementGridDino.insertAdjacentHTML("afterbegin", elementList.join(""));
 };
 
 // Add tiles to DOM
@@ -127,6 +117,7 @@ const removeForm = () => {
   elementForm.style.display = "none";
 };
 
+// Random Arrays fisherYatesShuffle
 function fisherYatesShuffle(array) {
   for (let i = 0; i < array.length; i++) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -134,47 +125,73 @@ function fisherYatesShuffle(array) {
   }
   return array;
 }
-//random
-const randomData = (listDino, human) => {
-  const list_arr = fisherYatesShuffle([0, 1, 2, 3, 4, 5, 6, 7]);
-  list_arr.map((element, index) => {
-    if(listDino[element].species === 'Pigeon')
-    {
-      return listDino[element];
+
+// Random data to get titles
+const randomData = (listDino) => {
+  const listIndexDinoRandom = fisherYatesShuffle([0, 1, 2, 3, 4, 5, 6, 7]);
+  listIndexDinoRandom.forEach((dinoIndex, index) => {
+    if (listDino[dinoIndex].species === "Pigeon") {
+      return;
     }
-    
     switch (index) {
-    case 0:
-      {
-        listDino[element].fact = factHeights( listDino[element].height, human.height)
-        return listDino[element]
+      case 0: {
+        listDino[dinoIndex].fact = factHeights(
+          listDino[dinoIndex].height,
+          humanOject.height
+        );
+        break;
       }
-    case 1:
-      {
-        listDino[element].fact = factWeight( listDino[element].weight, human.weight)
-        return listDino[element]
+      case 1: {
+        listDino[dinoIndex].fact = factWeight(
+          listDino[dinoIndex].weight,
+          humanOject.weight
+        );
+        break;
       }
-    case 2:
-      {
-        // listDino[element].fact = factDiet( listDino[element].diet, human.diet)
-        return listDino[element]
+      case 2: {
+        listDino[dinoIndex].fact = factDiet(
+          listDino[dinoIndex].diet,
+          humanOject.diet
+        );
+        break;
       }
-  
-    default:
-      return listDino[element];
-  }})
-  return fisherYatesShuffle(listDino)
+
+      default:
+        break;
+    }
+  });
+  return fisherYatesShuffle(listDino);
+};
+
+const validateFormHuman = () => {
+  let isValid = true;
+  const elementErr = document.getElementById("text-err");
+  elementErr.innerHTML = "";
+  if (!humanOject.species) {
+    isValid = false;
+    elementErr.innerHTML += `<p>Please enter name</p>`;
+  }
+  if (!humanOject.height) {
+    isValid = false;
+    elementErr.innerHTML += `<p>Please enter height</p>`;
+  }
+  if (!humanOject.weight) {
+    isValid = false;
+    elementErr.innerHTML += `<p>Please enter weight</p>`;
+  }
+  return isValid;
 };
 
 // On button click, prepare and display infographic
-
 const btn = document.getElementById("btn");
 btn.onclick = async () => {
-  const human = await getDataHuman(); // data human
-  const dino = await getDinoOject(); //mảng dino
-  const dataGenerate = randomData(dino, human);
-  console.log(dino,human );
-  generateTiles(dataGenerate, human);
+  getDataHuman();
+  if (!validateFormHuman()) {
+    return;
+  }
+
   removeForm();
-  // getData()
+  const dinoListOject = await getDinoOject();
+  const dataGenerate = randomData(dinoListOject);
+  generateTiles(dataGenerate);
 };
